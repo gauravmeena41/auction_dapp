@@ -49,10 +49,12 @@ export const newAuction = async (img, desc, value) => {
     });
     await auction.wait();
   } catch (error) {
-    if (
-      error.data.message.includes("You must pay more than last bid amopunt.")
-    ) {
-      return "You must pay more than last bid amopunt.";
+    if (error) {
+      if (
+        error.data.message.includes("You must pay more than last bid amopunt.")
+      ) {
+        return "You must pay more than last bid amopunt.";
+      }
     }
   }
 };
