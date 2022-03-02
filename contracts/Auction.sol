@@ -4,8 +4,9 @@ pragma solidity ^0.8.10;
 
 contract Auction {
     address payable public owner;
-    string imageAddress;
-    string text;
+    string imageAddress =
+        "https://images.unsplash.com/photo-1646071206496-0d8288613824?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80";
+    string text = "Auction Text";
     uint256 lastAuctionAmount = 0;
 
     constructor() payable {

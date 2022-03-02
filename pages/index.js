@@ -5,7 +5,7 @@ import { auction, newAuction } from "../helper";
 export default function Home() {
   const [file, setFile] = useState("");
   const [desc, setDesc] = useState("");
-  const [auctionValue, setAuctionValue] = useState();
+  const [auctionValue, setAuctionValue] = useState("");
   const [lastAuction, setLastAuction] = useState([]);
 
   const fetchAuction = async () => {
@@ -14,9 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchAuction();
-  }, []);
-
-  console.log(lastAuction);
+  }, [desc.length <= 0]);
 
   return (
     <div className="flex items-center justify-around h-[100vh]">
@@ -32,7 +30,7 @@ export default function Home() {
         <img
           src={lastAuction[0] ? lastAuction[0] : ""}
           alt=""
-          className="w-1/2 h-auto max-h-[400px] object-cover rounded-lg"
+          className="w-5/6 h-auto max-h-[400px] object-cover rounded-lg"
         />
         <div className="grid grid-cols-5 place-items-center space-x-5">
           <h1 className="col-span-3 text-xl ">
@@ -50,22 +48,41 @@ export default function Home() {
           Create your auction
         </h1>
         <form
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            if (!file) {
+              alert("You must add a image.");
+              return;
+            }
+            const res = await newAuction(file, desc, auctionValue);
+            if (res === "You must pay more than last bid amount.") {
+              alert(res);
+            }
+            setDesc("");
+            setAuctionValue("");
+            setFile("");
+          }}
           className="flex flex-col space-y-5"
         >
           <input
             type="text"
             placeholder="What's on your mind?"
             value={desc}
+            required
             onChange={(e) => setDesc(e.target.value)}
-            className="bg-gray-600 rounded outline-none px-4 py-1"
+            className={`bg-gray-600 rounded outline-none px-4 py-1 ${
+              desc === "" ? "focus:placeholder:text-red-400" : ""
+            }`}
           />
           <input
             type="number"
             placeholder="Enter auction value in wei"
             value={auctionValue}
+            required
             onChange={(e) => setAuctionValue(e.target.value)}
-            className="bg-gray-600 rounded outline-none px-4 py-1"
+            className={`bg-gray-600 rounded outline-none px-4 py-1 ${
+              !auctionValue ? "focus:placeholder:text-red-400" : ""
+            }`}
           />
           <label
             htmlFor="file"
@@ -80,28 +97,24 @@ export default function Home() {
             id="file"
             className="hidden"
           />
-        </form>
-        {file && (
+          {file && (
+            <div className="flex justify-center">
+              <img
+                src={URL.createObjectURL(file)}
+                alt=""
+                className="rounded-lg max-w-5/6 h-auto max-h-[300px] object-cover"
+              />
+            </div>
+          )}
           <div className="flex justify-center">
-            <img
-              src={URL.createObjectURL(file)}
-              alt=""
-              className="rounded-lg w-1/2 h-auto max-h-[300px] object-cover"
-            />
+            <button
+              className="bg-blue-500 px-10 py-2 rounded font-semibold"
+              type="submit"
+            >
+              Create Auction
+            </button>
           </div>
-        )}
-        <div className="flex justify-center">
-          <button
-            className="bg-blue-500 px-10 py-2 rounded font-semibold"
-            type="submit"
-            onClick={async () => {
-              await newAuction(file, desc, auctionValue);
-              window.location.reload();
-            }}
-          >
-            Create Auction
-          </button>
-        </div>
+        </form>
       </div>
     </div>
   );

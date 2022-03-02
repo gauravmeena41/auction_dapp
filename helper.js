@@ -38,15 +38,23 @@ export const getContract = async () => {
 
 export const newAuction = async (img, desc, value) => {
   if (!img || !desc || !value) return;
-  const contract = await getContract();
+  try {
+    const contract = await getContract();
 
-  const added = await client.add(img);
-  const imgAddress = `https://ipfs.infura.io/ipfs/${added.path}`;
+    const added = await client.add(img);
+    const imgAddress = `https://ipfs.infura.io/ipfs/${added.path}`;
 
-  const auction = await contract.newAuction(imgAddress, desc, {
-    value: ethers.utils.parseUnits(value, "wei"),
-  });
-  await auction.wait();
+    const auction = await contract.newAuction(imgAddress, desc, {
+      value: ethers.utils.parseUnits(value, "wei"),
+    });
+    await auction.wait();
+  } catch (error) {
+    if (
+      error.data.message.includes("You must pay more than last bid amopunt.")
+    ) {
+      return "You must pay more than last bid amopunt.";
+    }
+  }
 };
 
 export const auction = async () => {
